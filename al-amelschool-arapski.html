@@ -28,7 +28,7 @@
         width: 100%;
         padding: 12px;
         border-radius: 8px;
-        border: 1px solid #fffafa;
+        border: 1px solid #ddd;
         margin-top: 10px;
         font-size: 16px;
     }
@@ -69,13 +69,12 @@
         border: 1px solid #f0e3a2;
         margin-top: 10px;
     }
-
 </style>
 </head>
 
 <body>
 
-<div class="title-bar">Al-Amel School online grading system| نظام الدرجات </div>
+<div class="title-bar">Al-Amel School online grading system | نظام الدرجات</div>
 
 <!-- LOGIN PAGE -->
 <div class="card" id="loginPage">
@@ -167,6 +166,11 @@ const DB = {
     }
 };
 
+/* Utility for safe IDs */
+function safeId(text) {
+    return text.replace(/[^a-zA-Z0-9]/g, "_");
+}
+
 /* ---------------------------
            LOGIN
 ----------------------------*/
@@ -195,6 +199,10 @@ function showParent() {
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("parentDashboard").classList.remove("hidden");
 
+    renderParent();
+}
+
+function renderParent() {
     document.getElementById("studentName").innerText =
         "Student: " + DB.studentData.name;
 
@@ -225,10 +233,12 @@ function showTeacher() {
     box.innerHTML = "";
 
     for (let subject in DB.studentData.grades) {
+        let id = safeId(subject);
+
         box.innerHTML += `
         <div class="box">
             ${subject}:
-            <input type="number" min="1" max="100" id="g_${subject}" value="${DB.studentData.grades[subject]}">
+            <input type="number" min="1" max="100" id="g_${id}" value="${DB.studentData.grades[subject]}">
         </div>`;
     }
 
@@ -240,9 +250,11 @@ function showTeacher() {
        SAVE CHANGES
 ----------------------------*/
 function saveChanges() {
+
     // Save grades
     for (let subject in DB.studentData.grades) {
-        let newVal = document.getElementById("g_" + subject).value;
+        let id = safeId(subject);
+        let newVal = document.getElementById("g_" + id).value;
         DB.studentData.grades[subject] = Number(newVal);
     }
 
@@ -253,6 +265,8 @@ function saveChanges() {
     DB.studentData.note = document.getElementById("teacherNote").value;
 
     alert("تم الحفظ بنجاح!");
+
+    // If parent is logged in later, they see updates
 }
 
 /* ---------------------------
